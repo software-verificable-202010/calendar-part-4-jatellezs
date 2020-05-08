@@ -13,6 +13,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
+using Calendar.Model;
 
 namespace Calendar
 {
@@ -23,11 +27,11 @@ namespace Calendar
         static string[] weekDayNames = { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
         static readonly List<String> daysOfWeek = new List<string>(weekDayNames);
         String currentMonthName;
-        Int32 currentMonthNumber;
         DateTime firstDayOfMonth;
         String firstWeekDayOfMonth;
+        DateTime currentDate = DateTime.Now;
         Int32 currentYear;
-        DateTime currentDate;
+        Int32 currentMonthNumber;
         static Int32 listFirstPosition = -1;
         static Int32 firstPosition = 1;
         static string space = " ";
@@ -39,20 +43,83 @@ namespace Calendar
         Int32 endingPoint;
         Int32 dayNumber;
         TextBlock[] calendarGrid;
+        Int32 FIRST_DAY_OF_MONTH = 1;
+        Appointments appointments;
+        Int32 SMALL_FONT = 8;
+        List<ItemsControl> itemsControlsEvents = new List<ItemsControl>() { };
+        string TIME_FORMAT = "HH:mm";
+        string RIGHT_ARROW = "->";
+        string PATH_TO_SERIALIZED_FILE = "Appointments.txt";
 
-        public MainWindow()
+        public MainWindow(DateTime calendarDate)
         {
             InitializeComponent();
 
-            currentDate = DateTime.Now;
+            currentDate = calendarDate;
+            DeserializeCalendarContent();
             SetCalendarCells();
-            SetCalendarView(currentDate);
+            DeleteCellsDayNumber();
+            DeleteEvents();
+            SetCalendarView(currentDate, appointments);
         }
 
-        private void SetCalendarView(DateTime selectedDate)
+        private void DeserializeCalendarContent()
         {
-            DeleteCellsDayNumber();
+            try
+            {
+                IFormatter formatter = new BinaryFormatter();
+                Stream stream = new FileStream(PATH_TO_SERIALIZED_FILE, FileMode.Open, FileAccess.Read);
+                appointments = (Appointments)formatter.Deserialize(stream);
+                stream.Close();
+            }
+            catch
+            {
+                appointments = new Appointments();
+            }
+        }
 
+        private void SetEventsInDay(Appointments appointments, DateTime selectedDate, Int32 cellNumber)
+        {
+            ItemsControl appointmentItemControl = new ItemsControl();
+            TextBlock appointmentBlock;
+            Grid.SetRow(appointmentItemControl, Grid.GetRow(calendarGrid[cellNumber]));
+            Grid.SetColumn(appointmentItemControl, Grid.GetColumn(calendarGrid[cellNumber]));
+
+            foreach (Appointment appointment in appointments.appointments)
+            {
+                if (appointment.startDate.Date == selectedDate)
+                {
+                    appointmentBlock = new TextBlock();
+                    CreateTextBlockElement(appointmentBlock, appointment, appointmentItemControl);
+                }
+            }
+            appointmentItemControl.VerticalAlignment = VerticalAlignment.Bottom;
+            daysOfMonth.Children.Add(appointmentItemControl);
+            itemsControlsEvents.Add(appointmentItemControl);
+        }
+
+        private void CreateTextBlockElement(TextBlock appointmentBlock, Appointment appointment, ItemsControl appointmentItemControl)
+        {
+            appointmentBlock.Text = appointment.title + space + appointment.startDate.ToString(TIME_FORMAT) + RIGHT_ARROW + appointment.endDate.ToString("HH:mm");
+            appointmentBlock.FontSize = SMALL_FONT;
+            appointmentItemControl.Items.Add(appointmentBlock);
+        }
+
+        private void SetCalendarView(DateTime selectedDate, Appointments appointments)
+        {
+            SetDateGlobalVariables(selectedDate);
+
+            for ( int cellNumber = startingPoint; cellNumber < endingPoint; cellNumber++ )
+            {
+                dayNumber = cellNumber - startingPoint + firstPosition;
+                currentCell = calendarGrid[cellNumber];
+                currentCell.Text = dayNumber.ToString();
+                SetEventsInDay(appointments, new DateTime(currentYear, currentMonthNumber, dayNumber), cellNumber);
+            }
+        }
+
+        private void SetDateGlobalVariables(DateTime selectedDate)
+        {
             currentMonthName = GetMonthName(selectedDate);
             currentMonthNumber = GetMonthNumber(selectedDate);
             currentYear = GetYear(selectedDate);
@@ -63,13 +130,6 @@ namespace Calendar
 
             startingPoint = GetStartingCallendarCell(firstWeekDayOfMonth);
             endingPoint = GetDaysInMonth(currentYear, currentMonthNumber) + startingPoint;
-
-            for ( int cellNumber = startingPoint; cellNumber < endingPoint; cellNumber++ )
-            {
-                dayNumber = cellNumber - startingPoint + firstPosition;
-                currentCell = calendarGrid[cellNumber];
-                currentCell.Text = dayNumber.ToString();
-            }
         }
 
         private void WindowKeyDown(object sender, KeyEventArgs e)
@@ -77,12 +137,18 @@ namespace Calendar
             if (e.Key == Key.Left)
             {
                 currentDate = currentDate.AddMonths(previous);
-                SetCalendarView(currentDate);
+                SetCalendarView(currentDate, appointments);
             }
             else if (e.Key == Key.Right)
             {
                 currentDate = currentDate.AddMonths(next);
-                SetCalendarView(currentDate);
+                SetCalendarView(currentDate, appointments);
+            }
+            else if (e.Key == Key.Space)
+            {
+                WeekDetail weekDetail = new WeekDetail(new DateTime(currentYear, currentMonthNumber, FIRST_DAY_OF_MONTH));
+                weekDetail.Show();
+                this.Close();
             }
         }
 
@@ -108,7 +174,7 @@ namespace Calendar
 
         private string GetDayOfWeek(DateTime selectedDate)
         {
-            return selectedDate.ToString("dddd", new CultureInfo("en-EN"));
+            return selectedDate.ToString("dddd", new CultureInfo("en-US"));
         }
 
         private Int32 GetStartingCallendarCell(String dayOfWeekName)
@@ -127,6 +193,15 @@ namespace Calendar
             {
                 cell.Text = "";
             }
+        }
+
+        private void DeleteEvents()
+        {
+            foreach (ItemsControl itemsControl in itemsControlsEvents)
+            {
+                itemsControl.Items.Clear();
+            }
+            itemsControlsEvents.Clear();
         }
 
         private void SetCalendarCells()

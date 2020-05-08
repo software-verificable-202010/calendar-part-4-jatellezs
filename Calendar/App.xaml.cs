@@ -13,5 +13,10 @@ namespace Calendar
     /// </summary>
     public partial class App : Application
     {
+        void App_Startup(object sender, StartupEventArgs e)
+        {
+            MainWindow mainWindow = new MainWindow(DateTime.Now);
+            mainWindow.Show();
+        }
     }
 }
