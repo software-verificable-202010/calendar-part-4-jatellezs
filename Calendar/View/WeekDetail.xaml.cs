@@ -68,6 +68,11 @@ namespace Calendar
         Int32 SMALL_FONT = 8;
         string DAY_FORMAT = "dddd";
         string US_CULTURE_INFO = "en-US";
+        Int32 MARGIN_ZERO = 0;
+        string PATH_TO_SERIALIZED_FILE = "Appointments.txt";
+        Int32 FIRST_DATA_COLUMN = 1;
+        Int32 GREEN_BACKGORUND_COLOR = 0;
+        Int32 COLUMN_OFFSET = 1;
 
         public WeekDetail(DateTime selectedDate)
         {
@@ -102,7 +107,7 @@ namespace Calendar
             try
             {
                 IFormatter formatter = new BinaryFormatter();
-                Stream stream = new FileStream("Appointments.txt", FileMode.Open, FileAccess.Read);
+                Stream stream = new FileStream(PATH_TO_SERIALIZED_FILE, FileMode.Open, FileAccess.Read);
                 appointments = (Appointments)formatter.Deserialize(stream);
                 stream.Close();
             }
@@ -145,25 +150,25 @@ namespace Calendar
         {
             Grid weekHoursGrid = GridHoursOfDay;
             Double elementWidth;
-            Double rowWidth = GridHoursOfDay.ColumnDefinitions[1].Width.Value;
+            Double rowWidth = GridHoursOfDay.ColumnDefinitions[FIRST_DATA_COLUMN].Width.Value;
             elementWidth = rowWidth / numberOfEventsInCell[datesInCurrentWeek.IndexOf(appointment.startDate.Date)][appointment.startDate.Hour][EVENT_POSITION];
 
             SetTextBlockAttributes(appointmentBlock, appointment, elementWidth, currentEventHour);
 
             Grid.SetRow(appointmentBlock, currentEventHour);
-            Grid.SetColumn(appointmentBlock, datesInCurrentWeek.IndexOf(appointment.startDate.Date));
+            Grid.SetColumn(appointmentBlock, datesInCurrentWeek.IndexOf(appointment.startDate.Date) + COLUMN_OFFSET);
 
             weekHoursGrid.Children.Add(appointmentBlock);
 
-            numberOfEventsInCell[datesInCurrentWeek.IndexOf(appointment.startDate.Date)][currentEventHour][EVENTS_REMAINING_POSITION] += 1;
+            numberOfEventsInCell[datesInCurrentWeek.IndexOf(appointment.startDate.Date)][currentEventHour][EVENTS_REMAINING_POSITION] += ADD_EVENT;
         }
 
         private void SetTextBlockAttributes(TextBlock appointmentBlock, Appointment appointment, Double elementWidth, Int32 currentEventHour)
         {
             appointmentBlock.Text = appointment.title;
-            appointmentBlock.Background = appointmentsBackgroundColors[0];
+            appointmentBlock.Background = appointmentsBackgroundColors[GREEN_BACKGORUND_COLOR];
             appointmentBlock.HorizontalAlignment = HorizontalAlignment.Left;
-            appointmentBlock.Margin = new Thickness(numberOfEventsInCell[datesInCurrentWeek.IndexOf(appointment.startDate.Date)][currentEventHour][EVENTS_REMAINING_POSITION] * elementWidth, 0, 0, 0);
+            appointmentBlock.Margin = new Thickness(numberOfEventsInCell[datesInCurrentWeek.IndexOf(appointment.startDate.Date)][currentEventHour][EVENTS_REMAINING_POSITION] * elementWidth, MARGIN_ZERO, MARGIN_ZERO, MARGIN_ZERO);
             appointmentBlock.Width = elementWidth;
             appointmentBlock.TextWrapping = TextWrapping.Wrap;
             appointmentBlock.FontSize = SMALL_FONT;

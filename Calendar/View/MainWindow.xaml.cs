@@ -32,7 +32,7 @@ namespace Calendar
         DateTime currentDate = DateTime.Now;
         Int32 currentYear;
         Int32 currentMonthNumber;
-        static Int32 listFirstPosition = -1;
+        Int32 LIST_POSITION_OFFSET = -1;
         static Int32 firstPosition = 1;
         static string space = " ";
         static Int32 next = 1;
@@ -48,8 +48,11 @@ namespace Calendar
         Int32 SMALL_FONT = 8;
         List<ItemsControl> itemsControlsEvents = new List<ItemsControl>() { };
         string TIME_FORMAT = "HH:mm";
+        string DAY_FORMAT = "dddd";
+        string US_CULTURE_INFO = "en-US";
         string RIGHT_ARROW = "->";
         string PATH_TO_SERIALIZED_FILE = "Appointments.txt";
+        string EMPTY_TEXT = "";
 
         public MainWindow(DateTime calendarDate)
         {
@@ -100,7 +103,7 @@ namespace Calendar
 
         private void CreateTextBlockElement(TextBlock appointmentBlock, Appointment appointment, ItemsControl appointmentItemControl)
         {
-            appointmentBlock.Text = appointment.title + space + appointment.startDate.ToString(TIME_FORMAT) + RIGHT_ARROW + appointment.endDate.ToString("HH:mm");
+            appointmentBlock.Text = appointment.title + space + appointment.startDate.ToString(TIME_FORMAT) + RIGHT_ARROW + appointment.endDate.ToString(TIME_FORMAT);
             appointmentBlock.FontSize = SMALL_FONT;
             appointmentItemControl.Items.Add(appointmentBlock);
         }
@@ -136,11 +139,15 @@ namespace Calendar
         {
             if (e.Key == Key.Left)
             {
+                DeleteCellsDayNumber();
+                DeleteEvents();
                 currentDate = currentDate.AddMonths(previous);
                 SetCalendarView(currentDate, appointments);
             }
             else if (e.Key == Key.Right)
             {
+                DeleteCellsDayNumber();
+                DeleteEvents();
                 currentDate = currentDate.AddMonths(next);
                 SetCalendarView(currentDate, appointments);
             }
@@ -164,7 +171,7 @@ namespace Calendar
 
         private string GetMonthName(DateTime selectedDate)
         {
-            return monthsOfYear[GetMonthNumber(selectedDate) + listFirstPosition];
+            return monthsOfYear[GetMonthNumber(selectedDate) + LIST_POSITION_OFFSET];
         }
 
         private Int32 GetMonthNumber(DateTime selectedDate)
@@ -174,7 +181,7 @@ namespace Calendar
 
         private string GetDayOfWeek(DateTime selectedDate)
         {
-            return selectedDate.ToString("dddd", new CultureInfo("en-US"));
+            return selectedDate.ToString(DAY_FORMAT, new CultureInfo(US_CULTURE_INFO));
         }
 
         private Int32 GetStartingCallendarCell(String dayOfWeekName)
@@ -191,7 +198,7 @@ namespace Calendar
         {
             foreach (TextBlock cell in calendarGrid)
             {
-                cell.Text = "";
+                cell.Text = EMPTY_TEXT;
             }
         }
 
