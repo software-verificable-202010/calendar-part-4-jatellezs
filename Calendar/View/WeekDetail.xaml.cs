@@ -51,7 +51,6 @@ namespace Calendar
         internal int[] DefaultEvent = { 1, 0 };
         internal string DayFormat = "dddd";
         internal string PathToAppointmentsFile = "Appointments.txt";
-        internal string Dash = "-";
         internal CultureInfo USCultureInfo = new CultureInfo("en-US");
         #endregion
 
@@ -159,7 +158,8 @@ namespace Calendar
         {
             if (monthsInWeek.Count == BiMonthWeek)
             {
-                monthsInWeekText = monthsInWeek[FirstMonthInList] + Dash + monthsInWeek[SecondMonthInList];
+                monthsInWeekText = String.Format(USCultureInfo, "{0} - {1}",
+                    monthsInWeek[FirstMonthInList], monthsInWeek[SecondMonthInList]);
             }
             else
             {
@@ -173,7 +173,8 @@ namespace Calendar
         {
             if (yearsInWeek.Count == BiYearWeek)
             {
-                yearsInWeekText = yearsInWeek[FirstYearInList] + Dash + yearsInWeek[SecondYearInList];
+                yearsInWeekText = String.Format(USCultureInfo, "{0} - {1}",
+                    yearsInWeek[FirstYearInList], yearsInWeek[SecondYearInList]);
             }
             else
             {

@@ -33,10 +33,8 @@ namespace Calendar
         internal static int FirstPositionOffset = 1;
         internal string TimeFormat = "HH:mm";
         internal string DayFormat = "dddd";
-        internal string RightArrow = "->";
         internal string PathToAppointmentsFile = "Appointments.txt";
         internal string EmptyText = "";
-        internal static string Space = " ";
         internal CultureInfo USCultureInfo = new CultureInfo("en-US");
         #endregion
 
@@ -146,7 +144,8 @@ namespace Calendar
             firstDayOfMonth = GetFirstDayOfMonth(selectedDate);
             firstWeekDayOfMonth = GetDayOfWeek(firstDayOfMonth);
 
-            TextBlockDisplayedDate.Text = currentMonthName + Space + currentYear.ToString(USCultureInfo);
+            TextBlockDisplayedDate.Text = String.Format(USCultureInfo, "{0} {1}",
+                currentMonthName, currentYear.ToString(USCultureInfo));
 
             startingPoint = GetStartingCallendarCell(firstWeekDayOfMonth);
             endingPoint = GetDaysInMonth(currentYear, currentMonthNumber) + startingPoint;
@@ -223,7 +222,8 @@ namespace Calendar
 
         private void CreateTextBlockElement(TextBlock appointmentBlock, Appointment appointment, ItemsControl appointmentItemControl)
         {
-            appointmentBlock.Text = appointment.Title + Space + appointment.StartDate.ToString(TimeFormat, USCultureInfo) + RightArrow + appointment.EndDate.ToString(DayFormat, USCultureInfo);
+            appointmentBlock.Text = String.Format(USCultureInfo, "{0}: {1} -> {2}",
+                appointment.Title, appointment.StartDate.ToString(TimeFormat, USCultureInfo), appointment.EndDate.ToString(TimeFormat, USCultureInfo));
             appointmentBlock.FontSize = SmallFont;
             appointmentItemControl.Items.Add(appointmentBlock);
         }

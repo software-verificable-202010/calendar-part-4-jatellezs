@@ -193,7 +193,9 @@ namespace Calendar.View
 
             SetNewAppointmentData();
 
-            if (IsInputValid())
+            bool hasItemSelected = ListBoxMyAppointments.SelectedItem != null;
+            bool isUpdateValid = hasItemSelected && IsInputValid();
+            if (isUpdateValid)
             {
                 UpdateAppointment(appointmentInDatabase);
                 SerializeAppointmentsFile(appointmentDatabase);
