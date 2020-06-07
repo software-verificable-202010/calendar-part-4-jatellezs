@@ -8,13 +8,90 @@ using System.Threading.Tasks;
 namespace Calendar.Model
 {
     [Serializable]
-    public class Appointment : INotifyPropertyChanged
+    public class Appointment
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-        internal DateTime startDate { get; set; }
-        internal DateTime endDate { get; set; }
-        internal string title { get; set; }
-        internal string description { get; set; }
-    }
+        #region Fields
+        private DateTime startDate;
+        private DateTime endDate;
+        private string title;
+        private string description;
+        private User creator;
+        private List<User> participants;
+        #endregion
 
+        #region Properties
+        public Appointment()
+        {
+            participants = new List<User>() { };
+        }
+
+        public DateTime StartDate
+        {
+            get
+            {
+                return startDate;
+            }
+            set
+            {
+                startDate = value;
+            }
+        }
+
+        public DateTime EndDate
+        {
+            get
+            {
+                return endDate;
+            }
+            set
+            {
+                endDate = value;
+            }
+        }
+
+        public string Title
+        {
+            get
+            {
+                return title;
+            }
+            set
+            {
+                title = value;
+            }
+        }
+
+        public string Description
+        {
+            get
+            {
+                return description;
+            }
+            set
+            {
+                description = value;
+            }
+        }
+
+        public User Creator
+        {
+            get
+            {
+                return creator;
+            }
+            set
+            {
+                creator = value;
+            }
+        }
+
+        public List<User> Participants
+        {
+            get
+            {
+                return participants;
+            }
+        }
+        #endregion
+    }
 }

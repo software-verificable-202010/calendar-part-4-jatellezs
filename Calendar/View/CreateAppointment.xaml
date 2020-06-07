@@ -9,11 +9,11 @@
         mc:Ignorable="d"
         Title="CreateAppointment" Height="450" Width="800">
     <Grid>
-        <TextBox x:Name="TextBoxTitle" Text="Title" Height="20" Width="200" Margin="0 0 0 200"></TextBox>
-        <TextBox x:Name="TextBoxDescription" Text="Description" Height="80" Width="200" Margin="0 0 0 60"></TextBox>
-        <DatePicker x:Name="DatePickerDateOfEvent" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0 80 0 0" SelectedDate="{x:Static sys:DateTime.Now}"></DatePicker>
-        <TextBlock Height="20" Text="Start Time" TextAlignment="Center" FontSize="12" Margin="0 160 200 0"></TextBlock>
-        <ComboBox x:Name="ComboBoxInitialHour" Height="20" Width="40" Margin="0 160 60 0">
+        <TextBox x:Name="TextBoxTitle" Text="Title" Height="20" Width="200" HorizontalAlignment="Left" Margin="150 0 0 200"></TextBox>
+        <TextBox x:Name="TextBoxDescription" Text="Description" Height="80" Width="200" HorizontalAlignment="Left" Margin="150 0 0 60"></TextBox>
+        <DatePicker x:Name="DatePickerDateOfEvent" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="172 80 0 0" SelectedDate="{x:Static sys:DateTime.Now}"></DatePicker>
+        <TextBlock Height="20" Text="Start Time" TextAlignment="Center" FontSize="12" HorizontalAlignment="Left" Margin="100 160 200 0"></TextBlock>
+        <ComboBox x:Name="ComboBoxInitialHour" Height="20" Width="40" HorizontalAlignment="Left" Margin="195 160 60 0">
             <ComboBoxItem IsSelected="True">00</ComboBoxItem>
             <ComboBoxItem>01</ComboBoxItem>
             <ComboBoxItem>02</ComboBoxItem>
@@ -40,7 +40,7 @@
             <ComboBoxItem>23</ComboBoxItem>
         </ComboBox>
 
-        <ComboBox x:Name="ComboBoxInitialMinute" Height="20" Width="40" Margin="60 160 0 0">
+        <ComboBox x:Name="ComboBoxInitialMinute" Height="20" Width="40" HorizontalAlignment="Left" Margin="260 160 0 0">
             <ComboBoxItem IsSelected="True">00</ComboBoxItem>
             <ComboBoxItem>01</ComboBoxItem>
             <ComboBoxItem>02</ComboBoxItem>
@@ -103,8 +103,8 @@
             <ComboBoxItem>59</ComboBoxItem>
         </ComboBox>
 
-        <TextBlock Height="20" Text="End Time" TextAlignment="Center" FontSize="12" Margin="0 240 200 0"></TextBlock>
-        <ComboBox x:Name="ComboBoxFinalHour" Height="20" Width="40" Margin="0 240 60 0">
+        <TextBlock Height="20" Text="End Time" TextAlignment="Center" FontSize="12" HorizontalAlignment="Left" Margin="100 240 200 0"></TextBlock>
+        <ComboBox x:Name="ComboBoxFinalHour" Height="20" Width="40" HorizontalAlignment="Left" Margin="195 240 60 0">
             <ComboBoxItem IsSelected="True">00</ComboBoxItem>
             <ComboBoxItem>01</ComboBoxItem>
             <ComboBoxItem>02</ComboBoxItem>
@@ -131,7 +131,7 @@
             <ComboBoxItem>23</ComboBoxItem>
         </ComboBox>
 
-        <ComboBox x:Name="ComboBoxFinalMinute" Height="20" Width="40" Margin="60 240 0 0">
+        <ComboBox x:Name="ComboBoxFinalMinute" Height="20" Width="40" HorizontalAlignment="Left" Margin="260 240 0 0">
             <ComboBoxItem IsSelected="True">00</ComboBoxItem>
             <ComboBoxItem>01</ComboBoxItem>
             <ComboBoxItem>02</ComboBoxItem>
@@ -193,6 +193,19 @@
             <ComboBoxItem>58</ComboBoxItem>
             <ComboBoxItem>59</ComboBoxItem>
         </ComboBox>
+
+        <ListBox x:Name="ListBoxUsers" Height="235" Width="200" HorizontalAlignment="Right" Margin="0 16 100 0" SelectionMode="Multiple">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="0.2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{Binding Name}"></TextBlock>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
 
         <Button x:Name="ButtonCreate" Height="30" Width="100" Margin="0 340 140 0" Click="ButtonCreate_Click">Create</Button>
         <Button x:Name="ButtonCancel" Height="30" Width="100" Margin="160 340 0 0" Click="ButtonCancel_Click">Cancel</Button>

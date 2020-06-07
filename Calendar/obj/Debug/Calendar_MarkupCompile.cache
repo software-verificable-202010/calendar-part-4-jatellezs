@@ -10,11 +10,11 @@ none
 false
 DEBUG;TRACE
 C:\Users\joaqu\source\repos\Calendar\Calendar\App.xaml
-31561228723
+5-1731261119
 
-9-2048515223
+13150043804
 13-1505183044
-View\CreateAppointment.xaml;View\MainWindow.xaml;View\WeekDetail.xaml;
+View\CreateAppointment.xaml;View\LoginWindow.xaml;View\MainWindow.xaml;View\ManageAppointmentsWindow.xaml;View\WeekDetail.xaml;
 
 False
 

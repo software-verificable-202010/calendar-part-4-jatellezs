@@ -17,53 +17,64 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using Calendar.Model;
+using Calendar.View;
 
 namespace Calendar
 {
     public partial class MainWindow : Window
     {
-        static string[] months = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
-        static readonly List<String> monthsOfYear = new List<String>(months);
-        static string[] weekDayNames = { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
-        static readonly List<String> daysOfWeek = new List<string>(weekDayNames);
-        String currentMonthName;
-        DateTime firstDayOfMonth;
-        String firstWeekDayOfMonth;
-        DateTime currentDate = DateTime.Now;
-        Int32 currentYear;
-        Int32 currentMonthNumber;
-        Int32 LIST_POSITION_OFFSET = -1;
-        static Int32 firstPosition = 1;
-        static string space = " ";
-        static Int32 next = 1;
-        static Int32 previous = -1;
-        static Int32 firstDay = 1;
-        TextBlock currentCell;
-        Int32 startingPoint;
-        Int32 endingPoint;
-        Int32 dayNumber;
-        TextBlock[] calendarGrid;
-        Int32 FIRST_DAY_OF_MONTH = 1;
-        Appointments appointments;
-        Int32 SMALL_FONT = 8;
-        List<ItemsControl> itemsControlsEvents = new List<ItemsControl>() { };
-        string TIME_FORMAT = "HH:mm";
-        string DAY_FORMAT = "dddd";
-        string US_CULTURE_INFO = "en-US";
-        string RIGHT_ARROW = "->";
-        string PATH_TO_SERIALIZED_FILE = "Appointments.txt";
-        string EMPTY_TEXT = "";
+        #region Constants
+        internal int ListPositionOffset = 1;
+        internal int FirstDayOfMonth = 1;
+        internal int SmallFont = 8;
+        internal static int NextMonth = 1;
+        internal static int PreviousMonth = -1;
+        internal static int FirstDay = 1;
+        internal static int FirstPositionOffset = 1;
+        internal string TimeFormat = "HH:mm";
+        internal string DayFormat = "dddd";
+        internal string RightArrow = "->";
+        internal string PathToAppointmentsFile = "Appointments.txt";
+        internal string EmptyText = "";
+        internal static string Space = " ";
+        internal CultureInfo USCultureInfo = new CultureInfo("en-US");
+        #endregion
 
-        public MainWindow(DateTime calendarDate)
+        #region Fields
+        private TextBlock textBlockCurrentCell;
+        private TextBlock textBlockAppointmentDisplay;
+        private TextBlock[] textBlocksCalendarGrid;
+        private static readonly string[] months = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
+        private static readonly List<string> monthsOfYear = new List<String>(months);
+        private static readonly string[] weekDayNames = { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
+        private static readonly List<string> daysOfWeek = new List<string>(weekDayNames);
+        private List<ItemsControl> itemsControlsEvents = new List<ItemsControl>() { };
+        private int startingPoint;
+        private int endingPoint;
+        private int dayNumber;
+        private int currentYear;
+        private int currentMonthNumber;
+        private string currentMonthName;
+        private string firstWeekDayOfMonth;
+        private DateTime firstDayOfMonth;
+        private DateTime currentDate = DateTime.Now;
+        private AppointmentDatabase appointmentDatabase;
+        private readonly User currentUser;
+        #endregion
+
+        #region Methods
+        public MainWindow(DateTime calendarDate, User user)
         {
             InitializeComponent();
 
             currentDate = calendarDate;
+            currentUser = user;
+
             DeserializeCalendarContent();
             SetCalendarCells();
             DeleteCellsDayNumber();
             DeleteEvents();
-            SetCalendarView(currentDate, appointments);
+            SetCalendarView(currentDate, appointmentDatabase);
         }
 
         private void DeserializeCalendarContent()
@@ -71,52 +82,58 @@ namespace Calendar
             try
             {
                 IFormatter formatter = new BinaryFormatter();
-                Stream stream = new FileStream(PATH_TO_SERIALIZED_FILE, FileMode.Open, FileAccess.Read);
-                appointments = (Appointments)formatter.Deserialize(stream);
+                Stream stream = new FileStream(PathToAppointmentsFile, FileMode.Open, FileAccess.Read);
+                appointmentDatabase = formatter.Deserialize(stream) as AppointmentDatabase;
                 stream.Close();
             }
-            catch
+            catch (Exception ex) when (ex is FileNotFoundException || ex is SerializationException)
             {
-                appointments = new Appointments();
+                appointmentDatabase = new AppointmentDatabase();
             }
         }
 
-        private void SetEventsInDay(Appointments appointments, DateTime selectedDate, Int32 cellNumber)
+        private void SetCalendarCells()
         {
-            ItemsControl appointmentItemControl = new ItemsControl();
-            TextBlock appointmentBlock;
-            Grid.SetRow(appointmentItemControl, Grid.GetRow(calendarGrid[cellNumber]));
-            Grid.SetColumn(appointmentItemControl, Grid.GetColumn(calendarGrid[cellNumber]));
+            textBlocksCalendarGrid = new TextBlock[] {
+                TextBlockCell0, TextBlockCell1, TextBlockCell2, TextBlockCell3, TextBlockCell4,
+                TextBlockCell5, TextBlockCell6, TextBlockCell7, TextBlockCell8, TextBlockCell9,
+                TextBlockCell10, TextBlockCell11, TextBlockCell12, TextBlockCell13, TextBlockCell14,
+                TextBlockCell15, TextBlockCell16, TextBlockCell17, TextBlockCell18, TextBlockCell19,
+                TextBlockCell20, TextBlockCell21, TextBlockCell22, TextBlockCell23, TextBlockCell24,
+                TextBlockCell25, TextBlockCell26, TextBlockCell27, TextBlockCell28, TextBlockCell29,
+                TextBlockCell30, TextBlockCell31, TextBlockCell32, TextBlockCell33, TextBlockCell34,
+                TextBlockCell35, TextBlockCell36, TextBlockCell37, TextBlockCell38, TextBlockCell39,
+                TextBlockCell40, TextBlockCell41
+            };
+        }
 
-            foreach (Appointment appointment in appointments.appointments)
+        private void DeleteCellsDayNumber()
+        {
+            foreach (TextBlock cell in textBlocksCalendarGrid)
             {
-                if (appointment.startDate.Date == selectedDate)
-                {
-                    appointmentBlock = new TextBlock();
-                    CreateTextBlockElement(appointmentBlock, appointment, appointmentItemControl);
-                }
+                cell.Text = EmptyText;
             }
-            appointmentItemControl.VerticalAlignment = VerticalAlignment.Bottom;
-            daysOfMonth.Children.Add(appointmentItemControl);
-            itemsControlsEvents.Add(appointmentItemControl);
         }
 
-        private void CreateTextBlockElement(TextBlock appointmentBlock, Appointment appointment, ItemsControl appointmentItemControl)
+        private void DeleteEvents()
         {
-            appointmentBlock.Text = appointment.title + space + appointment.startDate.ToString(TIME_FORMAT) + RIGHT_ARROW + appointment.endDate.ToString(TIME_FORMAT);
-            appointmentBlock.FontSize = SMALL_FONT;
-            appointmentItemControl.Items.Add(appointmentBlock);
+            foreach (ItemsControl itemsControl in itemsControlsEvents)
+            {
+                itemsControl.Items.Clear();
+            }
+
+            itemsControlsEvents.Clear();
         }
 
-        private void SetCalendarView(DateTime selectedDate, Appointments appointments)
+        private void SetCalendarView(DateTime selectedDate, AppointmentDatabase appointments)
         {
             SetDateGlobalVariables(selectedDate);
 
-            for ( int cellNumber = startingPoint; cellNumber < endingPoint; cellNumber++ )
+            for (int cellNumber = startingPoint; cellNumber < endingPoint; cellNumber++)
             {
-                dayNumber = cellNumber - startingPoint + firstPosition;
-                currentCell = calendarGrid[cellNumber];
-                currentCell.Text = dayNumber.ToString();
+                dayNumber = cellNumber - startingPoint + FirstPositionOffset;
+                textBlockCurrentCell = textBlocksCalendarGrid[cellNumber];
+                textBlockCurrentCell.Text = dayNumber.ToString(USCultureInfo);
                 SetEventsInDay(appointments, new DateTime(currentYear, currentMonthNumber, dayNumber), cellNumber);
             }
         }
@@ -129,10 +146,86 @@ namespace Calendar
             firstDayOfMonth = GetFirstDayOfMonth(selectedDate);
             firstWeekDayOfMonth = GetDayOfWeek(firstDayOfMonth);
 
-            TextBlockDisplayedDate.Text = currentMonthName + space + currentYear.ToString();
+            TextBlockDisplayedDate.Text = currentMonthName + Space + currentYear.ToString(USCultureInfo);
 
             startingPoint = GetStartingCallendarCell(firstWeekDayOfMonth);
             endingPoint = GetDaysInMonth(currentYear, currentMonthNumber) + startingPoint;
+        }
+
+        private string GetMonthName(DateTime selectedDate)
+        {
+            return monthsOfYear[GetMonthNumber(selectedDate) - ListPositionOffset];
+        }
+
+        private int GetMonthNumber(DateTime selectedDate)
+        {
+            return selectedDate.Month;
+        }
+
+        private int GetYear(DateTime selectedDate)
+        {
+            return selectedDate.Year;
+        }
+
+        private DateTime GetFirstDayOfMonth(DateTime selectedDate)
+        {
+            return new DateTime(GetYear(selectedDate), GetMonthNumber(selectedDate), FirstDay);
+        }
+
+        private string GetDayOfWeek(DateTime selectedDate)
+        {
+            return selectedDate.ToString(DayFormat, USCultureInfo);
+        }
+
+        private int GetStartingCallendarCell(string dayOfWeekName)
+        {
+            return daysOfWeek.IndexOf(dayOfWeekName);
+        }
+
+        private int GetDaysInMonth(int year, int monthNUmber)
+        {
+            return DateTime.DaysInMonth(year, monthNUmber);
+        }
+
+        private void SetEventsInDay(AppointmentDatabase appointments, DateTime selectedDate, int cellNumber)
+        {
+            ItemsControl itemsControlAppointment = new ItemsControl();
+            Grid.SetRow(itemsControlAppointment, Grid.GetRow(textBlocksCalendarGrid[cellNumber]));
+            Grid.SetColumn(itemsControlAppointment, Grid.GetColumn(textBlocksCalendarGrid[cellNumber]));
+
+            foreach (Appointment appointment in appointments.Appointments)
+            {
+                bool areEqualDates = appointment.StartDate.Date == selectedDate;
+                bool isUserAppointmentInDate = areEqualDates && IsCurrentUserAppointment(appointment);
+                if (isUserAppointmentInDate)
+                {
+                    textBlockAppointmentDisplay = new TextBlock();
+                    CreateTextBlockElement(textBlockAppointmentDisplay, appointment, itemsControlAppointment);
+                }
+            }
+
+            itemsControlAppointment.VerticalAlignment = VerticalAlignment.Bottom;
+            daysOfMonth.Children.Add(itemsControlAppointment);
+            itemsControlsEvents.Add(itemsControlAppointment);
+        }
+
+        private bool IsCurrentUserAppointment(Appointment appointment)
+        {
+            bool isUserAppointment = false;
+
+            if (appointment.Participants.Find(u => u.Name == currentUser.Name) != null)
+            {
+                isUserAppointment = true;
+            }
+
+            return isUserAppointment;
+        }
+
+        private void CreateTextBlockElement(TextBlock appointmentBlock, Appointment appointment, ItemsControl appointmentItemControl)
+        {
+            appointmentBlock.Text = appointment.Title + Space + appointment.StartDate.ToString(TimeFormat, USCultureInfo) + RightArrow + appointment.EndDate.ToString(DayFormat, USCultureInfo);
+            appointmentBlock.FontSize = SmallFont;
+            appointmentItemControl.Items.Add(appointmentBlock);
         }
 
         private void WindowKeyDown(object sender, KeyEventArgs e)
@@ -141,87 +234,40 @@ namespace Calendar
             {
                 DeleteCellsDayNumber();
                 DeleteEvents();
-                currentDate = currentDate.AddMonths(previous);
-                SetCalendarView(currentDate, appointments);
+                currentDate = currentDate.AddMonths(PreviousMonth);
+                SetCalendarView(currentDate, appointmentDatabase);
             }
             else if (e.Key == Key.Right)
             {
                 DeleteCellsDayNumber();
                 DeleteEvents();
-                currentDate = currentDate.AddMonths(next);
-                SetCalendarView(currentDate, appointments);
+                currentDate = currentDate.AddMonths(NextMonth);
+                SetCalendarView(currentDate, appointmentDatabase);
             }
             else if (e.Key == Key.Space)
             {
-                WeekDetail weekDetail = new WeekDetail(new DateTime(currentYear, currentMonthNumber, FIRST_DAY_OF_MONTH));
-                weekDetail.Show();
+                CreateAndDisplayWeekDetailWindow();
                 this.Close();
             }
         }
 
-        private DateTime GetFirstDayOfMonth(DateTime selectedDate)
+        private void CreateAndDisplayWeekDetailWindow()
         {
-            return new DateTime(GetYear(selectedDate), GetMonthNumber(selectedDate), firstDay);
+            WeekDetail weekDetailWindow = new WeekDetail(new DateTime(currentYear, currentMonthNumber, FirstDayOfMonth), currentUser);
+            weekDetailWindow.Show();
         }
 
-        private Int32 GetYear(DateTime selectedDate)
+        private void ButtonLogOut_Click(object sender, RoutedEventArgs e)
         {
-            return selectedDate.Year;
+            CreateAndDisplayLoginWindow();
+            this.Close();
         }
 
-        private string GetMonthName(DateTime selectedDate)
+        private void CreateAndDisplayLoginWindow()
         {
-            return monthsOfYear[GetMonthNumber(selectedDate) + LIST_POSITION_OFFSET];
+            LoginWindow loginWindow = new LoginWindow();
+            loginWindow.Show();
         }
-
-        private Int32 GetMonthNumber(DateTime selectedDate)
-        {
-            return selectedDate.Month;
-        }
-
-        private string GetDayOfWeek(DateTime selectedDate)
-        {
-            return selectedDate.ToString(DAY_FORMAT, new CultureInfo(US_CULTURE_INFO));
-        }
-
-        private Int32 GetStartingCallendarCell(String dayOfWeekName)
-        {
-            return daysOfWeek.IndexOf(dayOfWeekName);
-        }
-
-        private Int32 GetDaysInMonth(Int32 year, Int32 monthNUmber)
-        {
-            return DateTime.DaysInMonth(year, monthNUmber);
-        }
-
-        private void DeleteCellsDayNumber()
-        {
-            foreach (TextBlock cell in calendarGrid)
-            {
-                cell.Text = EMPTY_TEXT;
-            }
-        }
-
-        private void DeleteEvents()
-        {
-            foreach (ItemsControl itemsControl in itemsControlsEvents)
-            {
-                itemsControl.Items.Clear();
-            }
-            itemsControlsEvents.Clear();
-        }
-
-        private void SetCalendarCells()
-        {
-            calendarGrid = new TextBlock[] { TextBlockCell0, TextBlockCell1, TextBlockCell2, TextBlockCell3, TextBlockCell4,
-                                            TextBlockCell5, TextBlockCell6, TextBlockCell7, TextBlockCell8, TextBlockCell9,
-                                            TextBlockCell10, TextBlockCell11, TextBlockCell12, TextBlockCell13, TextBlockCell14,
-                                            TextBlockCell15, TextBlockCell16, TextBlockCell17, TextBlockCell18, TextBlockCell19,
-                                            TextBlockCell20, TextBlockCell21, TextBlockCell22, TextBlockCell23, TextBlockCell24,
-                                            TextBlockCell25, TextBlockCell26, TextBlockCell27, TextBlockCell28, TextBlockCell29,
-                                            TextBlockCell30, TextBlockCell31, TextBlockCell32, TextBlockCell33, TextBlockCell34,
-                                            TextBlockCell35, TextBlockCell36, TextBlockCell37, TextBlockCell38, TextBlockCell39,
-                                            TextBlockCell40, TextBlockCell41};
-        }
+        #endregion
     }
 }

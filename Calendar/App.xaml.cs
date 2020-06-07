@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Calendar.View;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -15,8 +16,8 @@ namespace Calendar
     {
         void App_Startup(object sender, StartupEventArgs e)
         {
-            MainWindow mainWindow = new MainWindow(DateTime.Now);
-            mainWindow.Show();
+            LoginWindow loginWindow = new LoginWindow();
+            loginWindow.Show();
         }
     }
 }

@@ -17,3 +17,7 @@ C:\Users\joaqu\source\repos\Calendar\Calendar\obj\Debug\View\WeekDetail.g.cs
 C:\Users\joaqu\source\repos\Calendar\Calendar\obj\Debug\View\WeekDetail.baml
 C:\Users\joaqu\source\repos\Calendar\Calendar\obj\Debug\View\CreateAppointment.g.cs
 C:\Users\joaqu\source\repos\Calendar\Calendar\obj\Debug\View\CreateAppointment.baml
+C:\Users\joaqu\source\repos\Calendar\Calendar\obj\Debug\View\LoginWindow.g.cs
+C:\Users\joaqu\source\repos\Calendar\Calendar\obj\Debug\View\LoginWindow.baml
+C:\Users\joaqu\source\repos\Calendar\Calendar\obj\Debug\View\ManageAppointmentsWindow.g.cs
+C:\Users\joaqu\source\repos\Calendar\Calendar\obj\Debug\View\ManageAppointmentsWindow.baml

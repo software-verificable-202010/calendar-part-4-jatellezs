@@ -14,6 +14,12 @@
             <TextBlock x:Name="TextBlockDisplayedYears" Text="" HorizontalAlignment="Center" Margin="0,50,0,0" 
                VerticalAlignment="Top" Width="auto" Height="30" FontSize="20"></TextBlock>
 
+            <Button x:Name="ButtonManageAppointments" Width="120" Height="25" FontSize="12" Margin="0 12 30 0"
+               VerticalAlignment="Top" HorizontalAlignment="Right" Click="ButtonManageAppointments_Click">My Appointments</Button>
+
+            <Button x:Name="ButtonLogOut" Width="120" Height="25" FontSize="12" Margin="0 47 30 0"
+               VerticalAlignment="Top" HorizontalAlignment="Right" Click="ButtonLogOut_Click">Log Out</Button>
+
             <Grid x:Name="weekDays" HorizontalAlignment="Center" Height="40" Margin="20,0,0,409" VerticalAlignment="Bottom" Width="729">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="50"></ColumnDefinition>
