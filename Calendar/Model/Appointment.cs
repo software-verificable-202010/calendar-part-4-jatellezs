@@ -99,9 +99,12 @@ namespace Calendar.Model
         {
             bool isSelectedUserAppointment = false;
 
-            if (this.Creator.Name == user.Name)
+            if (user != null)
             {
-                isSelectedUserAppointment = true;
+                if (this.Creator.Name == user.Name)
+                {
+                    isSelectedUserAppointment = true;
+                }
             }
 
             return isSelectedUserAppointment;

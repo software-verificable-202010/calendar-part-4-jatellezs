@@ -104,9 +104,12 @@ namespace CalendarProject.ViewModel
         {
             List<Appointment> selectedUsersAppointments = new List<Appointment>();
 
-            foreach (User user in selectedUsers)
+            if (selectedUsers != null && appointmentDatabase != null)
             {
-                selectedUsersAppointments.AddRange(appointmentDatabase.GetSelectedUserWantedAppointments(user, selectedAppointment));
+                foreach (User user in selectedUsers)
+                {
+                    selectedUsersAppointments.AddRange(appointmentDatabase.GetSelectedUserWantedAppointments(user, selectedAppointment));
+                }
             }
 
             return selectedUsersAppointments;
@@ -132,11 +135,14 @@ namespace CalendarProject.ViewModel
         {
             bool hasCollision = false;
 
-            foreach (Appointment appointment in usersAppointments)
+            if (usersAppointments != null)
             {
-                if (appointment.IsBetweenDates(startDate, endDate))
+                foreach (Appointment appointment in usersAppointments)
                 {
-                    hasCollision = true;
+                    if (appointment.IsBetweenDates(startDate, endDate))
+                    {
+                        hasCollision = true;
+                    }
                 }
             }
 
@@ -147,9 +153,12 @@ namespace CalendarProject.ViewModel
         {
             List<Appointment> selectedUsersAppointments = new List<Appointment>();
 
-            foreach (User user in selectedUsers)
+            if (selectedUsers != null && appointmentDatabase != null)
             {
-                selectedUsersAppointments.AddRange(appointmentDatabase.GetSelectedUserAppointments(user));
+                foreach (User user in selectedUsers)
+                {
+                    selectedUsersAppointments.AddRange(appointmentDatabase.GetSelectedUserAppointments(user));
+                }
             }
 
             return selectedUsersAppointments;
