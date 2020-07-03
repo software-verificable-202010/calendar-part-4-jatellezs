@@ -115,6 +115,21 @@ namespace CalendarProject.ViewModel
             return selectedUsersAppointments;
         }
 
+        public static List<Appointment> GetParticipantsAppointments(List<User> selectedUsers, AppointmentDatabase appointmentDatabase)
+        {
+            List<Appointment> selectedUsersAppointments = new List<Appointment>();
+
+            if (selectedUsers != null && appointmentDatabase != null)
+            {
+                foreach (User user in selectedUsers)
+                {
+                    selectedUsersAppointments.AddRange(appointmentDatabase.GetSelectedUserAppointments(user));
+                }
+            }
+
+            return selectedUsersAppointments;
+        }
+
         public static bool IsAppointmentInputValid(DateTime startDate, DateTime endDate, List<Appointment> usersAppointments)
         {
             bool isValid = true;
@@ -147,21 +162,6 @@ namespace CalendarProject.ViewModel
             }
 
             return hasCollision;
-        }
-
-        public static List<Appointment> GetParticipantsAppointments(List<User> selectedUsers, AppointmentDatabase appointmentDatabase)
-        {
-            List<Appointment> selectedUsersAppointments = new List<Appointment>();
-
-            if (selectedUsers != null && appointmentDatabase != null)
-            {
-                foreach (User user in selectedUsers)
-                {
-                    selectedUsersAppointments.AddRange(appointmentDatabase.GetSelectedUserAppointments(user));
-                }
-            }
-
-            return selectedUsersAppointments;
         }
         #endregion
     }

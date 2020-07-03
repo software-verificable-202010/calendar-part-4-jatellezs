@@ -87,37 +87,6 @@ namespace Calendar
             };
         }
 
-        private void DeleteCellsDayNumber()
-        {
-            foreach (TextBlock cell in textBlocksCalendarGrid)
-            {
-                cell.Text = EmptyText;
-            }
-        }
-
-        private void DeleteEvents()
-        {
-            foreach (ItemsControl itemsControl in itemsControlsEvents)
-            {
-                itemsControl.Items.Clear();
-            }
-
-            itemsControlsEvents.Clear();
-        }
-
-        private void SetCalendarView(DateTime selectedDate, AppointmentDatabase appointments)
-        {
-            SetDateGlobalVariables(selectedDate);
-
-            for (int cellNumber = startingPoint; cellNumber < endingPoint; cellNumber++)
-            {
-                dayNumber = cellNumber - startingPoint + FirstPositionOffset;
-                textBlockCurrentCell = textBlocksCalendarGrid[cellNumber];
-                textBlockCurrentCell.Text = dayNumber.ToString(USCultureInfo);
-                SetEventsInDay(appointments, new DateTime(currentYear, currentMonthNumber, dayNumber), cellNumber);
-            }
-        }
-
         private void SetDateGlobalVariables(DateTime selectedDate)
         {
             currentMonthName = Utils.GetMonthName(selectedDate);
@@ -183,6 +152,37 @@ namespace Calendar
             {
                 CreateAndDisplayWeekDetailWindow();
                 this.Close();
+            }
+        }
+
+        private void DeleteCellsDayNumber()
+        {
+            foreach (TextBlock cell in textBlocksCalendarGrid)
+            {
+                cell.Text = EmptyText;
+            }
+        }
+
+        private void DeleteEvents()
+        {
+            foreach (ItemsControl itemsControl in itemsControlsEvents)
+            {
+                itemsControl.Items.Clear();
+            }
+
+            itemsControlsEvents.Clear();
+        }
+
+        private void SetCalendarView(DateTime selectedDate, AppointmentDatabase appointments)
+        {
+            SetDateGlobalVariables(selectedDate);
+
+            for (int cellNumber = startingPoint; cellNumber < endingPoint; cellNumber++)
+            {
+                dayNumber = cellNumber - startingPoint + FirstPositionOffset;
+                textBlockCurrentCell = textBlocksCalendarGrid[cellNumber];
+                textBlockCurrentCell.Text = dayNumber.ToString(USCultureInfo);
+                SetEventsInDay(appointments, new DateTime(currentYear, currentMonthNumber, dayNumber), cellNumber);
             }
         }
 
