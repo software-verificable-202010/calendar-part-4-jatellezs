@@ -1,0 +1,17 @@
+C:\Users\joaqu\source\repos\Calendar\Calendar.Tests\bin\Debug\netstandard2.1\NUnit3.TestAdapter.dll
+C:\Users\joaqu\source\repos\Calendar\Calendar.Tests\bin\Debug\netstandard2.1\NUnit3.TestAdapter.pdb
+C:\Users\joaqu\source\repos\Calendar\Calendar.Tests\bin\Debug\netstandard2.1\nunit.engine.dll
+C:\Users\joaqu\source\repos\Calendar\Calendar.Tests\bin\Debug\netstandard2.1\nunit.engine.api.dll
+C:\Users\joaqu\source\repos\Calendar\Calendar.Tests\bin\Debug\netstandard2.1\Calendar.Tests.deps.json
+C:\Users\joaqu\source\repos\Calendar\Calendar.Tests\bin\Debug\netstandard2.1\Calendar.Tests.dll
+C:\Users\joaqu\source\repos\Calendar\Calendar.Tests\bin\Debug\netstandard2.1\Calendar.Tests.pdb
+C:\Users\joaqu\source\repos\Calendar\Calendar.Tests\bin\Debug\netstandard2.1\CalendarProject.exe
+C:\Users\joaqu\source\repos\Calendar\Calendar.Tests\bin\Debug\netstandard2.1\CalendarProject.pdb
+C:\Users\joaqu\source\repos\Calendar\Calendar.Tests\bin\Debug\netstandard2.1\CalendarProject.exe.config
+C:\Users\joaqu\source\repos\Calendar\Calendar.Tests\obj\Debug\netstandard2.1\Calendar.Tests.csprojAssemblyReference.cache
+C:\Users\joaqu\source\repos\Calendar\Calendar.Tests\obj\Debug\netstandard2.1\Calendar.Tests.AssemblyInfoInputs.cache
+C:\Users\joaqu\source\repos\Calendar\Calendar.Tests\obj\Debug\netstandard2.1\Calendar.Tests.AssemblyInfo.cs
+C:\Users\joaqu\source\repos\Calendar\Calendar.Tests\obj\Debug\netstandard2.1\Calendar.Tests.csproj.CoreCompileInputs.cache
+C:\Users\joaqu\source\repos\Calendar\Calendar.Tests\obj\Debug\netstandard2.1\Calendar.Tests.csproj.CopyComplete
+C:\Users\joaqu\source\repos\Calendar\Calendar.Tests\obj\Debug\netstandard2.1\Calendar.Tests.dll
+C:\Users\joaqu\source\repos\Calendar\Calendar.Tests\obj\Debug\netstandard2.1\Calendar.Tests.pdb

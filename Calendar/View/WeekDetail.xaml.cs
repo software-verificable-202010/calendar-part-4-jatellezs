@@ -1,5 +1,6 @@
 ﻿using Calendar.Model;
 using Calendar.View;
+using CalendarProject.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -88,11 +89,11 @@ namespace Calendar
             InitializeComponent();
 
             currentUser = user;
+            appointmentDatabase = Utils.DeserializeAppointmentsFile(PathToAppointmentsFile);
 
             SetDateVariables(selectedDate);
             CreateWeekCells();
             SetWeekView();
-            DeserializeAppointments();
             SetCalendarBlocks();
         }
 
@@ -184,28 +185,13 @@ namespace Calendar
             TextBlockDisplayedYears.Text = yearsInWeekText;
         }
 
-        private void DeserializeAppointments()
-        {
-            try
-            {
-                IFormatter formatter = new BinaryFormatter();
-                Stream stream = new FileStream(PathToAppointmentsFile, FileMode.Open, FileAccess.Read);
-                appointmentDatabase = formatter.Deserialize(stream) as AppointmentDatabase;
-                stream.Close();
-            }
-            catch (Exception ex) when (ex is FileNotFoundException || ex is SerializationException)
-            {
-                appointmentDatabase = new AppointmentDatabase();
-            }
-        }
-
         private void SetCalendarBlocks()
         {
             SetAppointmentStartAndEndDateTimes();
 
             foreach (Appointment appointment in appointmentDatabase.Appointments)
             {
-                if (datesInCurrentWeek.Contains(appointment.StartDate.Date) && IsUserAppointment(appointment))
+                if (datesInCurrentWeek.Contains(appointment.StartDate.Date) && appointment.IsUserAppointment(currentUser))
                 {
                     SetBlocksInEventRange(appointment);
                 }
@@ -217,7 +203,7 @@ namespace Calendar
             foreach (Appointment appointment in appointmentDatabase.Appointments)
             {
                 bool isStartDateInCurrentWeek = datesInCurrentWeek.Contains(appointment.StartDate.Date);
-                bool isUserAppointmentInCurrentWeek = isStartDateInCurrentWeek && IsUserAppointment(appointment);
+                bool isUserAppointmentInCurrentWeek = isStartDateInCurrentWeek && appointment.IsUserAppointment(currentUser);
 
                 if (isUserAppointmentInCurrentWeek)
                 {
@@ -226,18 +212,6 @@ namespace Calendar
                     AddEventToNumberOfEventsInCell(datesInCurrentWeek.IndexOf(appointment.StartDate.Date), startHour, endHour);
                 }
             }
-        }
-
-        private bool IsUserAppointment(Appointment appointment)
-        {
-            bool isUserAppointment = false;
-
-            if (appointment.Participants.Find(u => u.Name == currentUser.Name) != null)
-            {
-                isUserAppointment = true;
-            }
-
-            return isUserAppointment;
         }
 
         private void AddEventToNumberOfEventsInCell(int dayOfWeek, int hourOfDay, int eventLapse)
@@ -359,7 +333,7 @@ namespace Calendar
             this.Close();
         }
 
-        private void CreateAndDisplayLoginWindow()
+        private static void CreateAndDisplayLoginWindow()
         {
             LoginWindow loginWindow = new LoginWindow();
             loginWindow.Show();

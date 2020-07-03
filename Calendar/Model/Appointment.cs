@@ -93,5 +93,56 @@ namespace Calendar.Model
             }
         }
         #endregion
+
+        #region Methods
+        public bool IsUserAppointmentCreator(User user)
+        {
+            bool isSelectedUserAppointment = false;
+
+            if (this.Creator.Name == user.Name)
+            {
+                isSelectedUserAppointment = true;
+            }
+
+            return isSelectedUserAppointment;
+        }
+
+        public bool IsUserAppointment(User user)
+        {
+            bool isUserAppointment = false;
+
+            if (this.Participants.Find(u => u.Name == user.Name) != null)
+            {
+                isUserAppointment = true;
+            }
+
+            return isUserAppointment;
+        }
+
+        public bool IsBetweenDates(DateTime startDateToCheck, DateTime endDateToCheck)
+        {
+            bool betweenDates = false;
+
+            bool isStartBeforeAppointmentStart = startDateToCheck <= this.StartDate;
+            bool isEndAfterAppointmentStart = endDateToCheck >= this.StartDate;
+            bool isStartBeforeAppointmentEnd = startDateToCheck <= this.EndDate;
+            bool isEndAfterAppointmentEnd = endDateToCheck >= this.EndDate;
+            bool isStartAfterAppointmentStart = startDateToCheck >= this.StartDate;
+            bool isEndBeforeAppointmentEnd = endDateToCheck <= this.EndDate;
+
+            bool isBetweenDatesLower = isStartBeforeAppointmentStart && isEndAfterAppointmentStart;
+            bool isBetweenDatesUpper = isStartBeforeAppointmentEnd && isEndAfterAppointmentEnd;
+            bool isBetweenDatesMiddle = isStartAfterAppointmentStart && isEndBeforeAppointmentEnd;
+
+            bool hasCollisionBetweenDates = isBetweenDatesLower || isBetweenDatesMiddle || isBetweenDatesUpper;
+
+            if (hasCollisionBetweenDates)
+            {
+                betweenDates = true;
+            }
+
+            return betweenDates;
+        }
+        #endregion
     }
 }

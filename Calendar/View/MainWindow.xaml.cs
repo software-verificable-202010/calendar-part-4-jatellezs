@@ -18,6 +18,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using Calendar.Model;
 using Calendar.View;
+using CalendarProject.ViewModel;
 
 namespace Calendar
 {
@@ -42,10 +43,6 @@ namespace Calendar
         private TextBlock textBlockCurrentCell;
         private TextBlock textBlockAppointmentDisplay;
         private TextBlock[] textBlocksCalendarGrid;
-        private static readonly string[] months = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
-        private static readonly List<string> monthsOfYear = new List<String>(months);
-        private static readonly string[] weekDayNames = { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
-        private static readonly List<string> daysOfWeek = new List<string>(weekDayNames);
         private List<ItemsControl> itemsControlsEvents = new List<ItemsControl>() { };
         private int startingPoint;
         private int endingPoint;
@@ -67,27 +64,12 @@ namespace Calendar
 
             currentDate = calendarDate;
             currentUser = user;
+            appointmentDatabase = Utils.DeserializeAppointmentsFile(PathToAppointmentsFile);
 
-            DeserializeCalendarContent();
             SetCalendarCells();
             DeleteCellsDayNumber();
             DeleteEvents();
             SetCalendarView(currentDate, appointmentDatabase);
-        }
-
-        private void DeserializeCalendarContent()
-        {
-            try
-            {
-                IFormatter formatter = new BinaryFormatter();
-                Stream stream = new FileStream(PathToAppointmentsFile, FileMode.Open, FileAccess.Read);
-                appointmentDatabase = formatter.Deserialize(stream) as AppointmentDatabase;
-                stream.Close();
-            }
-            catch (Exception ex) when (ex is FileNotFoundException || ex is SerializationException)
-            {
-                appointmentDatabase = new AppointmentDatabase();
-            }
         }
 
         private void SetCalendarCells()
@@ -138,52 +120,17 @@ namespace Calendar
 
         private void SetDateGlobalVariables(DateTime selectedDate)
         {
-            currentMonthName = GetMonthName(selectedDate);
-            currentMonthNumber = GetMonthNumber(selectedDate);
-            currentYear = GetYear(selectedDate);
-            firstDayOfMonth = GetFirstDayOfMonth(selectedDate);
-            firstWeekDayOfMonth = GetDayOfWeek(firstDayOfMonth);
+            currentMonthName = Utils.GetMonthName(selectedDate);
+            currentMonthNumber = Utils.GetMonthNumber(selectedDate);
+            currentYear = Utils.GetYear(selectedDate);
+            firstDayOfMonth = Utils.GetFirstDayOfMonth(selectedDate);
+            firstWeekDayOfMonth = Utils.GetDayOfWeek(firstDayOfMonth);
 
             TextBlockDisplayedDate.Text = String.Format(USCultureInfo, "{0} {1}",
                 currentMonthName, currentYear.ToString(USCultureInfo));
 
-            startingPoint = GetStartingCallendarCell(firstWeekDayOfMonth);
-            endingPoint = GetDaysInMonth(currentYear, currentMonthNumber) + startingPoint;
-        }
-
-        private string GetMonthName(DateTime selectedDate)
-        {
-            return monthsOfYear[GetMonthNumber(selectedDate) - ListPositionOffset];
-        }
-
-        private int GetMonthNumber(DateTime selectedDate)
-        {
-            return selectedDate.Month;
-        }
-
-        private int GetYear(DateTime selectedDate)
-        {
-            return selectedDate.Year;
-        }
-
-        private DateTime GetFirstDayOfMonth(DateTime selectedDate)
-        {
-            return new DateTime(GetYear(selectedDate), GetMonthNumber(selectedDate), FirstDay);
-        }
-
-        private string GetDayOfWeek(DateTime selectedDate)
-        {
-            return selectedDate.ToString(DayFormat, USCultureInfo);
-        }
-
-        private int GetStartingCallendarCell(string dayOfWeekName)
-        {
-            return daysOfWeek.IndexOf(dayOfWeekName);
-        }
-
-        private int GetDaysInMonth(int year, int monthNUmber)
-        {
-            return DateTime.DaysInMonth(year, monthNUmber);
+            startingPoint = Utils.GetStartingCallendarCell(firstWeekDayOfMonth);
+            endingPoint = Utils.GetDaysInMonth(currentYear, currentMonthNumber) + startingPoint;
         }
 
         private void SetEventsInDay(AppointmentDatabase appointments, DateTime selectedDate, int cellNumber)
@@ -195,7 +142,7 @@ namespace Calendar
             foreach (Appointment appointment in appointments.Appointments)
             {
                 bool areEqualDates = appointment.StartDate.Date == selectedDate;
-                bool isUserAppointmentInDate = areEqualDates && IsCurrentUserAppointment(appointment);
+                bool isUserAppointmentInDate = areEqualDates && appointment.IsUserAppointment(currentUser);
                 if (isUserAppointmentInDate)
                 {
                     textBlockAppointmentDisplay = new TextBlock();
@@ -206,18 +153,6 @@ namespace Calendar
             itemsControlAppointment.VerticalAlignment = VerticalAlignment.Bottom;
             daysOfMonth.Children.Add(itemsControlAppointment);
             itemsControlsEvents.Add(itemsControlAppointment);
-        }
-
-        private bool IsCurrentUserAppointment(Appointment appointment)
-        {
-            bool isUserAppointment = false;
-
-            if (appointment.Participants.Find(u => u.Name == currentUser.Name) != null)
-            {
-                isUserAppointment = true;
-            }
-
-            return isUserAppointment;
         }
 
         private void CreateTextBlockElement(TextBlock appointmentBlock, Appointment appointment, ItemsControl appointmentItemControl)
@@ -263,7 +198,7 @@ namespace Calendar
             this.Close();
         }
 
-        private void CreateAndDisplayLoginWindow()
+        private static void CreateAndDisplayLoginWindow()
         {
             LoginWindow loginWindow = new LoginWindow();
             loginWindow.Show();

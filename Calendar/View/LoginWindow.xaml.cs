@@ -1,4 +1,5 @@
 ﻿using Calendar.Model;
+using CalendarProject.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,14 +25,13 @@ namespace Calendar.View
     public partial class LoginWindow : Window
     {
         #region Constants
-        internal int MinUserNameLength = 4;
         internal string ErrorMessage = "Username must be 4 characters minimum";
         internal string MessageTitle = "Calendar";
         internal string PathToUsersFile = "Users.txt";
         #endregion
 
         #region Fields
-        private UserDatabase userDatabase;
+        private readonly UserDatabase userDatabase;
         #endregion
 
         #region Methods
@@ -39,33 +39,17 @@ namespace Calendar.View
         {
             InitializeComponent();
 
-            DeserializeUsersFile();
-        }
-
-        private void DeserializeUsersFile()
-        {
-            IFormatter readFormatter = new BinaryFormatter();
-            Stream readStream = new FileStream(PathToUsersFile, FileMode.OpenOrCreate, FileAccess.Read);
-
-            try
-            {
-                userDatabase = readFormatter.Deserialize(readStream) as UserDatabase;
-            }
-            catch (Exception ex) when (ex is FileNotFoundException || ex is SerializationException)
-            {
-                userDatabase = new UserDatabase();
-            }
-
-            readStream.Close();
+            userDatabase = Utils.DeserializeUsersFile(PathToUsersFile);
         }
 
         private void ButtonLogin_Click(object sender, RoutedEventArgs e)
         {
             string userName = TextBoxUserName.Text;
+            User user = new User(userName);
 
-            if (IsValidUserName(userName))
+            if (user.HasValidName())
             {
-                SaveUserInDatabase(new User(userName));
+                userDatabase.SaveUser(user);
                 CreateAndDisplayMainWindow(userName);
                 this.Close();
             }
@@ -75,38 +59,7 @@ namespace Calendar.View
             }
         }
 
-        private bool IsValidUserName(string userName)
-        {
-            bool isValid = false;
-
-            if (userName.Length >= MinUserNameLength)
-            {
-                isValid = true;
-            }
-
-            return isValid;
-        }
-
-        private void SaveUserInDatabase(User user)
-        {
-            if (userDatabase.RegisteredUsers.Find(u => u.Name == user.Name) == null)
-            {
-                userDatabase.RegisteredUsers.Add(user);
-            }
-
-            SerializeUsersFile(userDatabase);
-        }
-
-        private void SerializeUsersFile(UserDatabase users)
-        {
-            IFormatter writeFormatter = new BinaryFormatter();
-            Stream writeStream = new FileStream(PathToUsersFile, FileMode.Create, FileAccess.Write);
-
-            writeFormatter.Serialize(writeStream, users);
-            writeStream.Close();
-        }
-
-        private void CreateAndDisplayMainWindow(string userName)
+        private static void CreateAndDisplayMainWindow(string userName)
         {
             MainWindow mainWindow = new MainWindow(DateTime.Now, new User(userName));
             mainWindow.Show();

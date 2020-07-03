@@ -212,7 +212,7 @@ namespace Calendar {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/Calendar;component/view/weekdetail.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/CalendarProject;component/view/weekdetail.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\View\WeekDetail.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

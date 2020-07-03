@@ -1,0 +1,4 @@
+C:\Users\joaqu\source\repos\Calendar\Calendar.Tests\obj\Debug\net462\Calendar.Tests.csprojAssemblyReference.cache
+C:\Users\joaqu\source\repos\Calendar\Calendar.Tests\obj\Debug\net462\Calendar.Tests.AssemblyInfoInputs.cache
+C:\Users\joaqu\source\repos\Calendar\Calendar.Tests\obj\Debug\net462\Calendar.Tests.AssemblyInfo.cs
+C:\Users\joaqu\source\repos\Calendar\Calendar.Tests\obj\Debug\net462\Calendar.Tests.csproj.CoreCompileInputs.cache

@@ -9,6 +9,10 @@ namespace Calendar.Model
     [Serializable]
     public class User
     {
+        #region Constants
+        internal int MinUserNameLength = 4;
+        #endregion
+
         #region Fields
         private string name;
         #endregion
@@ -29,6 +33,20 @@ namespace Calendar.Model
             {
                 name = value;
             }
+        }
+        #endregion
+
+        #region Methods
+        public bool HasValidName()
+        {
+            bool isValid = false;
+
+            if (this.Name.Length >= MinUserNameLength)
+            {
+                isValid = true;
+            }
+
+            return isValid;
         }
         #endregion
     }

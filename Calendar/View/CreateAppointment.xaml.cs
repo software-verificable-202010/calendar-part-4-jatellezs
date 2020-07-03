@@ -1,4 +1,5 @@
 ﻿using Calendar.Model;
+using CalendarProject.ViewModel;
 using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections.Generic;
@@ -59,44 +60,10 @@ namespace Calendar.View
             InitializeComponent();
 
             currentUser = user;
+            appointmentDatabase = Utils.DeserializeAppointmentsFile(PathToAppointmentsFile);
+            userDatabase = Utils.DeserializeUsersFile(PathToUsersFile);
 
-            DeserializeAppointmentsFile();
-            DeserializeUsersFile();
             SetUsersInListBox();
-        }
-
-        private void DeserializeAppointmentsFile()
-        {
-            IFormatter readFormatter = new BinaryFormatter();
-            Stream readStream = new FileStream(PathToAppointmentsFile, FileMode.OpenOrCreate, FileAccess.Read);
-
-            try
-            {
-                appointmentDatabase = readFormatter.Deserialize(readStream) as AppointmentDatabase;
-            }
-            catch (Exception ex) when (ex is FileNotFoundException || ex is SerializationException)
-            {
-                appointmentDatabase = new AppointmentDatabase();
-            }
-
-            readStream.Close();
-        }
-
-        private void DeserializeUsersFile()
-        {
-            IFormatter readFormatter = new BinaryFormatter();
-            Stream readStream = new FileStream(PathToUsersFile, FileMode.OpenOrCreate, FileAccess.Read);
-
-            try
-            {
-                userDatabase = readFormatter.Deserialize(readStream) as UserDatabase;
-            }
-            catch (Exception ex) when (ex is FileNotFoundException || ex is SerializationException)
-            {
-                userDatabase = new UserDatabase();
-            }
-
-            readStream.Close();
         }
 
         private void SetUsersInListBox()
@@ -120,12 +87,15 @@ namespace Calendar.View
         private void ButtonCreate_Click(object sender, RoutedEventArgs e)
         {
             SaveInputInformation();
-            
-            if (IsValidInput())
+            DateTime startDate = new DateTime(selectedYear, selectedMonth, selectedDay, startHour, startMinute, DateSeconds);
+            DateTime endDate = new DateTime(selectedYear, selectedMonth, selectedDay, endHour, endMinute, DateSeconds);
+            selectedUsersAppointments = Utils.GetParticipantsAppointments(selectedUsers, appointmentDatabase);
+
+            if (Utils.IsAppointmentInputValid(startDate, endDate, selectedUsersAppointments))
             {
                 appointment = new Appointment();
                 CreateAppointmentsObject(appointment);
-                SerializeAppointmentsFile(appointmentDatabase);
+                appointmentDatabase.Serialize(PathToAppointmentsFile);
                 this.Close();
             }
             else
@@ -150,85 +120,6 @@ namespace Calendar.View
             }
         }
 
-        public bool IsValidInput()
-        {
-            DateTime startDate = new DateTime(selectedYear, selectedMonth, selectedDay, startHour, startMinute, DateSeconds);
-            DateTime endDate = new DateTime(selectedYear, selectedMonth, selectedDay, endHour, endMinute, DateSeconds);
-
-            SetParticipantsAppointments(selectedUsers);
-
-            bool isValid = true;
-            if (endDate <= startDate)
-            {
-                isValid = false;
-            }
-            else if (HasDateCollision(startDate, endDate))
-            {
-                isValid = false;
-            }
-
-            return isValid;
-        }
-
-        private void SetParticipantsAppointments(List<User> selectedUsers)
-        {
-            foreach (User user in selectedUsers)
-            {
-                SetSelectedUserAppointments(user);
-            }
-        }
-
-        private void SetSelectedUserAppointments(User user)
-        {
-            foreach (Appointment appointment in appointmentDatabase.Appointments)
-            {
-                if (appointment.Participants.Find(u => u.Name == user.Name) != null)
-                {
-                    selectedUsersAppointments.Add(appointment);
-                }
-            }
-        }
-
-        private bool HasDateCollision(DateTime startDate, DateTime endDate)
-        {
-            bool hasCollision = false;
-
-            foreach (Appointment appointment in selectedUsersAppointments)
-            {
-                if (IsBetweenDates(appointment, startDate, endDate))
-                {
-                    hasCollision = true;
-                }
-            }
-
-            return hasCollision;
-        }
-
-        private bool IsBetweenDates(Appointment appointment, DateTime startDateToCheck, DateTime endDateToCheck)
-        {
-            bool betweenDates = false;
-
-            bool isStartBeforeAppointmentStart = startDateToCheck <= appointment.StartDate;
-            bool isEndAfterAppointmentStart = endDateToCheck >= appointment.StartDate;
-            bool isStartBeforeAppointmentEnd = startDateToCheck <= appointment.EndDate;
-            bool isEndAfterAppointmentEnd = endDateToCheck >= appointment.EndDate;
-            bool isStartAfterAppointmentStart = startDateToCheck >= appointment.StartDate;
-            bool isEndBeforeAppointmentEnd = endDateToCheck <= appointment.EndDate;
-
-            bool isBetweenDatesLower = isStartBeforeAppointmentStart && isEndAfterAppointmentStart;
-            bool isBetweenDatesUpper = isStartBeforeAppointmentEnd && isEndAfterAppointmentEnd;
-            bool isBetweenDatesMiddle = isStartAfterAppointmentStart && isEndBeforeAppointmentEnd;
-
-            bool hasCollisionBetweenDates = isBetweenDatesLower || isBetweenDatesMiddle || isBetweenDatesUpper;
-
-            if (hasCollisionBetweenDates)
-            {
-                betweenDates = true;
-            }
-
-            return betweenDates;
-        }
-
         private void CreateAppointmentsObject(Appointment appointment)
         {
             appointment.Title = TextBoxTitle.Text;
@@ -244,15 +135,6 @@ namespace Calendar.View
             }
 
             appointmentDatabase.Appointments.Add(appointment);
-        }
-
-        private void SerializeAppointmentsFile(AppointmentDatabase appointments)
-        {
-            IFormatter writeFormatter = new BinaryFormatter();
-            Stream writeStream = new FileStream(PathToAppointmentsFile, FileMode.Create, FileAccess.Write);
-
-            writeFormatter.Serialize(writeStream, appointments);
-            writeStream.Close();
         }
 
         private void ButtonCancel_Click(object sender, RoutedEventArgs e)

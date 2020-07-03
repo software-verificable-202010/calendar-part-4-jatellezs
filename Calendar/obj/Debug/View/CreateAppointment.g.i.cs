@@ -132,7 +132,7 @@ namespace Calendar.View {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/Calendar;component/view/createappointment.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/CalendarProject;component/view/createappointment.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\View\CreateAppointment.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);
