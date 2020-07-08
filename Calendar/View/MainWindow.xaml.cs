@@ -87,51 +87,6 @@ namespace Calendar
             };
         }
 
-        private void SetDateGlobalVariables(DateTime selectedDate)
-        {
-            currentMonthName = Utils.GetMonthName(selectedDate);
-            currentMonthNumber = Utils.GetMonthNumber(selectedDate);
-            currentYear = Utils.GetYear(selectedDate);
-            firstDayOfMonth = Utils.GetFirstDayOfMonth(selectedDate);
-            firstWeekDayOfMonth = Utils.GetDayOfWeek(firstDayOfMonth);
-
-            TextBlockDisplayedDate.Text = String.Format(USCultureInfo, "{0} {1}",
-                currentMonthName, currentYear.ToString(USCultureInfo));
-
-            startingPoint = Utils.GetStartingCallendarCell(firstWeekDayOfMonth);
-            endingPoint = Utils.GetDaysInMonth(currentYear, currentMonthNumber) + startingPoint;
-        }
-
-        private void SetEventsInDay(AppointmentDatabase appointments, DateTime selectedDate, int cellNumber)
-        {
-            ItemsControl itemsControlAppointment = new ItemsControl();
-            Grid.SetRow(itemsControlAppointment, Grid.GetRow(textBlocksCalendarGrid[cellNumber]));
-            Grid.SetColumn(itemsControlAppointment, Grid.GetColumn(textBlocksCalendarGrid[cellNumber]));
-
-            foreach (Appointment appointment in appointments.Appointments)
-            {
-                bool areEqualDates = appointment.StartDate.Date == selectedDate;
-                bool isUserAppointmentInDate = areEqualDates && appointment.IsUserAppointment(currentUser);
-                if (isUserAppointmentInDate)
-                {
-                    textBlockAppointmentDisplay = new TextBlock();
-                    CreateTextBlockElement(textBlockAppointmentDisplay, appointment, itemsControlAppointment);
-                }
-            }
-
-            itemsControlAppointment.VerticalAlignment = VerticalAlignment.Bottom;
-            daysOfMonth.Children.Add(itemsControlAppointment);
-            itemsControlsEvents.Add(itemsControlAppointment);
-        }
-
-        private void CreateTextBlockElement(TextBlock appointmentBlock, Appointment appointment, ItemsControl appointmentItemControl)
-        {
-            appointmentBlock.Text = String.Format(USCultureInfo, "{0}: {1} -> {2}",
-                appointment.Title, appointment.StartDate.ToString(TimeFormat, USCultureInfo), appointment.EndDate.ToString(TimeFormat, USCultureInfo));
-            appointmentBlock.FontSize = SmallFont;
-            appointmentItemControl.Items.Add(appointmentBlock);
-        }
-
         private void WindowKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Left)
@@ -184,6 +139,51 @@ namespace Calendar
                 textBlockCurrentCell.Text = dayNumber.ToString(USCultureInfo);
                 SetEventsInDay(appointments, new DateTime(currentYear, currentMonthNumber, dayNumber), cellNumber);
             }
+        }
+
+        private void SetDateGlobalVariables(DateTime selectedDate)
+        {
+            currentMonthName = Utils.GetMonthName(selectedDate);
+            currentMonthNumber = Utils.GetMonthNumber(selectedDate);
+            currentYear = Utils.GetYear(selectedDate);
+            firstDayOfMonth = Utils.GetFirstDayOfMonth(selectedDate);
+            firstWeekDayOfMonth = Utils.GetDayOfWeek(firstDayOfMonth);
+
+            TextBlockDisplayedDate.Text = String.Format(USCultureInfo, "{0} {1}",
+                currentMonthName, currentYear.ToString(USCultureInfo));
+
+            startingPoint = Utils.GetStartingCallendarCell(firstWeekDayOfMonth);
+            endingPoint = Utils.GetDaysInMonth(currentYear, currentMonthNumber) + startingPoint;
+        }
+
+        private void SetEventsInDay(AppointmentDatabase appointments, DateTime selectedDate, int cellNumber)
+        {
+            ItemsControl itemsControlAppointment = new ItemsControl();
+            Grid.SetRow(itemsControlAppointment, Grid.GetRow(textBlocksCalendarGrid[cellNumber]));
+            Grid.SetColumn(itemsControlAppointment, Grid.GetColumn(textBlocksCalendarGrid[cellNumber]));
+
+            foreach (Appointment appointment in appointments.Appointments)
+            {
+                bool areEqualDates = appointment.StartDate.Date == selectedDate;
+                bool isUserAppointmentInDate = areEqualDates && appointment.IsUserAppointment(currentUser);
+                if (isUserAppointmentInDate)
+                {
+                    textBlockAppointmentDisplay = new TextBlock();
+                    CreateTextBlockElement(textBlockAppointmentDisplay, appointment, itemsControlAppointment);
+                }
+            }
+
+            itemsControlAppointment.VerticalAlignment = VerticalAlignment.Bottom;
+            daysOfMonth.Children.Add(itemsControlAppointment);
+            itemsControlsEvents.Add(itemsControlAppointment);
+        }
+
+        private void CreateTextBlockElement(TextBlock appointmentBlock, Appointment appointment, ItemsControl appointmentItemControl)
+        {
+            appointmentBlock.Text = String.Format(USCultureInfo, "{0}: {1} -> {2}",
+                appointment.Title, appointment.StartDate.ToString(TimeFormat, USCultureInfo), appointment.EndDate.ToString(TimeFormat, USCultureInfo));
+            appointmentBlock.FontSize = SmallFont;
+            appointmentItemControl.Items.Add(appointmentBlock);
         }
 
         private void CreateAndDisplayWeekDetailWindow()
